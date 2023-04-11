@@ -6,11 +6,11 @@ To develop a conversational language model using PyTorch and the transformer arc
 ## Project Implementation
 For this project I am using PyTorch and the transformer architecture detailed in the paper "Attention Is All You Need" by Vaswani et al.
 
-This model is to be trained on a ~26GB text dump from Wikipedia that has been formatted and cleaned by .
+This model is to be trained on a ~26GB text dump from Wikipedia that has been formatted and cleaned by David Shapiro.
 
 The Wikipedia data is tokenized using OpenAI's Tiktoken library.
 
-### Project Limitations
+## Project Limitations
 Here is a list of limitations of this model in order of easiest-to-address to hardest-to-address
 
 - Context Size: This language model by default uses a context size of 16, as set in `hyperparameters.py`, meaning that only the past 16 tokens are considered when the model is generating text. For context, the last-generation GPT-3 model uses 2048 tokens for context, meaning my model uses 0.8% the maximum context of GPT-3. While this is not important for shorter queries and responses, it is integral to have a large context size for longer, more coherent responses.
@@ -28,11 +28,16 @@ To run this model for yourself, all you need to do is run `main.py`
 
 ## Training The Model
 To train the model yourself, you will need to download the Wikipedia dataset from the Kaggle link in the Citations section.
+
 Once you have downloaded and extracted the data to the `data` directory in the project's directory, you will need to run `clean_json_files.py` to extract the raw text from the json files, this will export the data to a new folder suffixed with `-cleaned`.
+
 After this, the data will have to be tokenized, which is done with the `encode_data.py` file. Similarly, these tokenized files will be exported to a new folder suffixed with `-tokenized`.
+
 Once this data preparation has been completed, you may now run `train_model.py`, which trains a transformer model on the data in the `-tokenized` directory. The `-cleaned` directory may be deleted now, if you wish.
+
 Upon completion, the model will print a test generation to the console, and the weights will be exported as `weights.pt` under the `trained models` directory.
 These weights can now be loaded in `main.py`
+
 If you want to adjust the model's hyperparameters, they are accessible in `hyperparameters.py` and synchronize to all relevant files in this repo.
 
 ## Future Work
