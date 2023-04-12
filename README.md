@@ -6,9 +6,9 @@ To develop a conversational language model using PyTorch and the transformer arc
 ## Project Implementation
 For this project I am using PyTorch and the transformer architecture detailed in the paper "Attention Is All You Need" by Vaswani et al.
 
-This model is to be trained on a ~26GB text dump from Wikipedia that has been formatted and cleaned by David Shapiro.
+This model is to be trained on a ~26GB text dump from Wikipedia that has been formatted and cleaned by [David Shapiro](https://github.com/daveshap/PlainTextWikipedia).
 
-The Wikipedia data is tokenized using OpenAI's Tiktoken library.
+The Wikipedia data is tokenized using [OpenAI's Tiktoken library](https://github.com/openai/tiktoken).
 
 ## Project Limitations
 Here is a list of limitations of this model in order of easiest-to-address to hardest-to-address
@@ -31,7 +31,7 @@ To train the model yourself, you will need to download the Wikipedia dataset fro
 
 Once you have downloaded and extracted the data to the `data` directory in the project's directory, you will need to run `clean_json_files.py` to extract the raw text from the json files, this will export the data to a new folder suffixed with `-cleaned`.
 
-After this, the data will have to be tokenized, which is done with the `encode_data.py` file. Similarly, these tokenized files will be exported to a new folder suffixed with `-tokenized`.
+After this, the data will have to be tokenized, which is done with the `encode_data.py` file. Similarly, these tokenized files will be exported to a new folder suffixed with `-tokenized`. This step can take quite a while, which is why I decided to split it off into its own python file for modularity.
 
 Once this data preparation has been completed, you may now run `train_model.py`, which trains a transformer model on the data in the `-tokenized` directory. The `-cleaned` directory may be deleted now, if you wish.
 
@@ -47,4 +47,5 @@ Training the model on the WET files from Common Crawl would be a very interestin
 - David Shapiro's Plain Text Wikipedia Dataset: https://www.kaggle.com/datasets/ltcmdrdata/plain-text-wikipedia-202011
   - David Shapiro's Plain Text Wikipedia Repo: https://github.com/daveshap/PlainTextWikipedia
 - Andrej Karpathy's PyTorch Transformer Implementation Tutorial: https://www.youtube.com/watch?v=kCc8FmEb1nY
+- OpenAI's Tiktoken Repo: https://github.com/openai/tiktoken
 - Information on GPT-3: https://en.wikipedia.org/wiki/GPT-3

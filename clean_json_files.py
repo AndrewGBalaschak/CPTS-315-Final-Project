@@ -9,7 +9,6 @@ data_path = 'data/enwiki20201020'
 directory = os.fsencode(os.path.join(ROOT_DIR, data_path))
 
 count = 1
-
 for file in tqdm(os.listdir(directory)):
     filename = os.fsdecode(file)
     outfilename = "cleaned-file-" + str(count) + ".txt"
