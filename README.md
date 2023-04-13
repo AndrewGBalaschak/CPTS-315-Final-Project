@@ -29,7 +29,7 @@ To run this model for yourself, all you need to do is run `main.py`
 ## Training The Model
 To train the model yourself, you will need to download the Wikipedia dataset from the Kaggle link in the Citations section.
 
-Once you have downloaded and extracted the data to the `data` directory in the project's directory, you will need to run `clean_json_files.py` to extract the raw text from the json files, this will export the data to a new folder suffixed with `-cleaned`.
+Once you have downloaded and extracted the data to the `data` directory in the project's directory, you will need to run `clean_json_files.py` to extract the raw text from the json files, this will export the data to a new folder suffixed with `-cleaned`. This process takes quite some time since it not only extracts the text from the json files, but cleans it up a bit to remove non-natural language such as "== References ==" and "Category: ..." This step uses a lot of regular expressions, which Bing AI helped me to write, as I don't know much about their syntax. It's quite impressive, having a large language model help to write code for another large language model...
 
 After this, the data will have to be tokenized, which is done with the `encode_data.py` file. Similarly, these tokenized files will be exported to a new folder suffixed with `-tokenized`. This step can take quite a while, which is why I decided to split it off into its own python file for modularity.
 
@@ -49,3 +49,5 @@ Training the model on the WET files from Common Crawl would be a very interestin
 - Andrej Karpathy's PyTorch Transformer Implementation Tutorial: https://www.youtube.com/watch?v=kCc8FmEb1nY
 - OpenAI's Tiktoken Repo: https://github.com/openai/tiktoken
 - Information on GPT-3: https://en.wikipedia.org/wiki/GPT-3
+- Documentation for basically every library I used and even some I didn't use
+- Bing AI, thanks for helping me with regex, hopefully you've got my back once LLMs take over

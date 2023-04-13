@@ -7,6 +7,7 @@ num_batches = 1000                                          # Number of batches 
 learning_rate = 3e-4
 device = 'cuda' if torch.cuda.is_available() else 'cpu'     # Use GPU if available
 est_iters = 200                                             # Number of iterations to average for estimating loss
+min_line_length = 256                                       # Minimum number of characters for the line to be included in the dataset
 n_embd = 384
 n_head = 6
 n_layer = 6

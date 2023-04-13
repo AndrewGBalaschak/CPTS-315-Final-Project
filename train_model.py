@@ -95,6 +95,9 @@ print(sum(p.numel() for p in m.parameters())/1e6, 'M parameters')
 # Create a PyTorch optimizer
 optimizer = torch.optim.AdamW(model.parameters(), lr=h.learning_rate)
 
+model_debug = open(os.path.join(ROOT_DIR, 'trained models', 'model_loss.txt'), 'w', encoding='utf-8')
+model_debug.write(f"step, train loss, test loss\n")
+
 count = 1
 for file in tqdm(os.listdir(directory)):
     filename = os.fsdecode(file)
@@ -129,7 +132,15 @@ for file in tqdm(os.listdir(directory)):
 
     # Evaluate loss after training on a given file has finished
     losses = estimate_loss()
-    print(f"\nstep {count}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+    model_debug.write(f"{count},{losses['train']:.4f},{losses['val']:.4f}\n")
+
+    # Manual limit on number of files trained on
+    #if count > 10:
+    #    break
+
+    count += 1
+
+model_debug.close()
 
 # Save the weights
 torch.save(m.state_dict(), os.path.join(ROOT_DIR, 'trained models', 'weights.pt'))

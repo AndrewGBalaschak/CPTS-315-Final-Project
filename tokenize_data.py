@@ -6,6 +6,7 @@ ROOT_DIR = os.path.dirname(__file__)
 data_path = 'data/enwiki20201020'
 enc = tiktoken.get_encoding("cl100k_base")
 
+# This is deprecated, it's from back when I was only using the small "wikisent2" dataset
 '''
 batch_size = 10000
 
@@ -50,7 +51,6 @@ while(i < len(dataset)):
 output.close()
 '''
 
-
 directory = os.fsencode(os.path.join(ROOT_DIR, data_path + '-cleaned'))
 
 count = 1
@@ -66,10 +66,18 @@ for file in tqdm(os.listdir(directory)):
     encoded_data = enc.encode_batch(infile)
 
     # Write the data
+    first = True
     for line in encoded_data:
-        outfile.write(str(line)[1:-1].replace(" ", ""))
-        outfile.write("\n")
-
+        # Fenceposting
+        if first:
+            # Remove spaces
+            outfile.write(str(line)[1:-1].replace(" ", ""))
+            first = False
+        else:
+            # Remove spaces
+            outfile.write("\n")
+            outfile.write(str(line)[1:-1].replace(" ", ""))
+            
     #infile.close()
     outfile.close()
     count = count + 1
