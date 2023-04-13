@@ -1,12 +1,42 @@
 import json
 import os
-import tiktoken
+import re
 from tqdm import tqdm
 
 ROOT_DIR = os.path.dirname(__file__)
 data_path = 'data/enwiki20201020'
 
 directory = os.fsencode(os.path.join(ROOT_DIR, data_path))
+
+def remove_brackets(input_string):
+    output = ""
+    in_brackets = 0
+    in_curly = 0
+    in_equals = 0
+
+    for i in range(len(input_string)-1):
+        # Detect start
+        if input_string[i] == '[':
+            in_brackets += 1
+        elif input_string[i] == '{':
+            in_curly += 1
+        elif input_string[i] == '=' and input_string[i+1] == '=' and in_equals == 0:
+            in_equals += 1
+            i += 1
+        
+        # Detect end
+        elif input_string[i] == ']' and in_brackets > 0:
+            in_brackets -= 1
+        elif input_string[i] == '}' and in_curly > 0:
+            in_curly -= 1
+        elif input_string[i] == '=' and input_string[i-1] == '=' and in_equals > 0:
+            in_equals -= 1
+        
+        # Not in any restricted areas
+        elif in_brackets == 0 and in_equals == 0:
+            output += input_string[i]
+    
+    return output
 
 count = 1
 for file in tqdm(os.listdir(directory)):
@@ -24,9 +54,18 @@ for file in tqdm(os.listdir(directory)):
         for entry in data:
             line = entry['text']
 
-            # TODO - remove non-natural language content
-                # TODO - remove content in between ==
-                # TODO - remove context in between curly brackets
+
+            # This block removes non-natural language content
+            # Remove text between brackets
+            #line = remove_brackets(line)
+
+            re.sub("[\(\[].*?[\)\]]", "", x)
+
+            # Try to remove anything after "Category:"
+            try:
+                line = line[:line.index("Category:")]
+            except:
+                pass
             
             outfile.write(line)
             outfile.write("\n")

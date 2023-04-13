@@ -7,7 +7,7 @@ import hyperparameters as h
 from tqdm import tqdm
 
 ROOT_DIR = os.path.dirname(__file__)
-data_path = 'data/enwiki20201020-tokenized-small'
+data_path = 'data/enwiki20201020-tokenized'
 enc = tiktoken.get_encoding("cl100k_base")
 
 # Open pre-encoded dataset directory
@@ -76,8 +76,8 @@ def estimate_loss():
     out = {}
     model.eval()
     for split in ['train', 'val']:
-        losses = torch.zeros(h.eval_iters)
-        for k in range(h.eval_iters):
+        losses = torch.zeros(h.est_iters)
+        for k in range(h.est_iters):
             X, Y = my_get_batch(split)
             logits, loss = model(X, Y)
             losses[k] = loss.item()
@@ -95,6 +95,7 @@ print(sum(p.numel() for p in m.parameters())/1e6, 'M parameters')
 # Create a PyTorch optimizer
 optimizer = torch.optim.AdamW(model.parameters(), lr=h.learning_rate)
 
+count = 1
 for file in tqdm(os.listdir(directory)):
     filename = os.fsdecode(file)
     data_file = open(os.path.join(ROOT_DIR, data_path, filename), 'r', encoding='utf-8').read().splitlines()
@@ -107,7 +108,7 @@ for file in tqdm(os.listdir(directory)):
         for i in line.split(','):
             data_array[-1].append(int(i))
 
-    for iter in tqdm(range(h.max_iters)):
+    for iter in tqdm(range(h.num_batches)):
         #data_array = random.shuffle(data_array)
         
         # Train-Test split
@@ -128,7 +129,7 @@ for file in tqdm(os.listdir(directory)):
 
     # Evaluate loss after training on a given file has finished
     losses = estimate_loss()
-    print(f"\nstep {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+    print(f"\nstep {count}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
 
 # Save the weights
 torch.save(m.state_dict(), os.path.join(ROOT_DIR, 'trained models', 'weights.pt'))
