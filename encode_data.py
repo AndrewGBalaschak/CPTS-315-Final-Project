@@ -1,12 +1,10 @@
-import os
 import tiktoken
+import os
+import time
+import math
 from tqdm import tqdm
 
 ROOT_DIR = os.path.dirname(__file__)
-data_path = 'data/enwiki20201020'
-enc = tiktoken.get_encoding("cl100k_base")
-
-'''
 batch_size = 10000
 
 # Read Wikipedia dataset
@@ -20,7 +18,7 @@ enc = tiktoken.get_encoding("cl100k_base")
 # encoded_data = enc.encode_batch(dataset)
 
 # Open output file
-output = open(os.path.join(ROOT_DIR, 'data', 'pre-tokenized-data.txt'), 'w')
+output = open(os.path.join(ROOT_DIR, 'data', 'pre-encoded-data.txt'), 'w')
 
 # Encode the data in chunks of batch_size in order to save RAM
 i = 0
@@ -48,28 +46,3 @@ while(i < len(dataset)):
     batch_counter = batch_counter + 1
 
 output.close()
-'''
-
-
-directory = os.fsencode(os.path.join(ROOT_DIR, data_path + '-cleaned'))
-
-count = 1
-for file in tqdm(os.listdir(directory)):
-    filename = os.fsdecode(file)
-    outfilename = "token-file-" + str(count) + ".txt"
-
-    # Encode the data
-    infile = open(os.path.join(ROOT_DIR, data_path + '-cleaned', filename), 'r', encoding='utf-8').read().splitlines()
-    outfile = open(os.path.join(ROOT_DIR, data_path + '-tokenized', outfilename), 'w', encoding='utf-8')
-    
-    # Batch encode the data
-    encoded_data = enc.encode_batch(infile)
-
-    # Write the data
-    for line in encoded_data:
-        outfile.write(str(line)[1:-1].replace(" ", ""))
-        outfile.write("\n")
-
-    #infile.close()
-    outfile.close()
-    count = count + 1
