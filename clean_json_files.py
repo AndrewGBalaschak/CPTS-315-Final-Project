@@ -26,11 +26,12 @@ filter_pairs = [['(',')'], ['{','}'], ['==','==']]
 '''
 
 # Compiled regex for text cleanup
-regex_parentheses = re.compile(r'[(][^()]*[)]')
-regex_braces = re.compile(r'\{[^{}]*\}')
-regex_equals = re.compile(r'==[^=]*==')
-regex_punctuation = re.compile(r'\s+([,.!?])')
-regex_double_spaces = re.compile(r' +')
+regex_parentheses = re.compile(r'[(][^()]*[)]')         # Remove text between parentheses
+regex_braces = re.compile(r'\{[^{}]*\}')                # Remove text between curly braces
+regex_equals = re.compile(r'==[^=]*==')                 # Remove text between ==
+regex_english = re.compile(r'[^\x00-\x7F]+')            # Remove non-ASCII characaters
+regex_punctuation = re.compile(r'\s+([,.!?])')          # Remove any leftover spaces before punctuation
+regex_double_spaces = re.compile(r' +')                 # Remove any duplicate spaces
 
 # Remove non-natural language content using compiled regex
 def clean_string(input_string):
@@ -39,6 +40,8 @@ def clean_string(input_string):
     output = regex_parentheses.sub('', output)
     output = regex_braces.sub('', output)
     output = regex_equals.sub('', output)
+    output = regex_english.sub('', output)
+    output = output.replace('*', '')
     output = regex_punctuation.sub('', output)
     
     # Remove duplicate spaces that may have occured from previous step

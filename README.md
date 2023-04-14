@@ -19,26 +19,26 @@ Here is a list of limitations of this model in order of easiest-to-address to ha
 
 - Parameters: This language model uses 87.76 million parameters, which might seem like a lot, but for reference the last-generation GPT-3 model uses 175 billion parameters, meaning my model uses 0.05% (about one half of one half of one half of one half of one percent!) the parameters of GPT-3. As such, its output can not be expected to be on par with GPT-3.
 
-- Training Hardware: This language model was trained on high-end consumer hardware, which presents limitations in the amount of RAM and VRAM available for the model. Additionally, this limits the size of the model through limitations on available storage
+- Training Hardware: This language model was trained on high-end consumer hardware, which presents limitations in the amount of RAM, VRAM, and overall compute power available for the model. Additionally, this limits the size of the model through limitations on available storage for training data and exported model weights.
 
-- Training time: This language model was trained on my personal computer, which prevents me from being able to use my machine for other purposes while training is ongoing. As such, this limits the amount of training time that is possible.
+- Training time: This language model was trained on my personal computer, which prevents me from being able to use my machine for other purposes while training is ongoing. As such, this limits the amount of training time that is possible. Additionally, a consumer system cannot be expected to have 100% uptime along the entire training process, as things like Windows Update and even power delivery can cause the training to fail partway through.
 
 ## Running The Model
 To run this model for yourself, all you need to do is run `main.py`
 
 ## Training The Model
-To train the model yourself, you will need to download the Wikipedia dataset from the Kaggle link in the Citations section.
+To train the model yourself, you will need to download the Wikipedia dataset from the Kaggle link in the Citations section. Each step in this process can take quite a while, which is why I decided to split them off into their own python files for modularity.
 
 Once you have downloaded and extracted the data to the `data` directory in the project's directory, you will need to run `clean_json_files.py` to extract the raw text from the json files, this will export the data to a new folder suffixed with `-cleaned`. This process takes quite some time since it not only extracts the text from the json files, but cleans it up a bit to remove non-natural language such as "== References ==" and "Category: ..." This step uses a lot of regular expressions, which Bing AI helped me to write, as I don't know much about their syntax. It's quite impressive, having a large language model help to write code for another large language model...
 
-After this, the data will have to be tokenized, which is done with the `encode_data.py` file. Similarly, these tokenized files will be exported to a new folder suffixed with `-tokenized`. This step can take quite a while, which is why I decided to split it off into its own python file for modularity.
+After this, the data will have to be tokenized, which is done with the `encode_data.py` file. Similarly, these tokenized files will be exported to a new folder suffixed with `-tokenized`.
 
 Once this data preparation has been completed, you may now run `train_model.py`, which trains a transformer model on the data in the `-tokenized` directory. The `-cleaned` directory may be deleted now, if you wish.
 
 Upon completion, the model will print a test generation to the console, and the weights will be exported as `weights.pt` under the `trained models` directory.
 These weights can now be loaded in `main.py`
 
-If you want to adjust the model's hyperparameters, they are accessible in `hyperparameters.py` and synchronize to all relevant files in this repo.
+If you want to adjust the model's hyperparameters, they are accessible in `hyperparameters.py` and synchronize to all relevant files in this repo. There is some documentation in the `hyperparameters.py` file that details how each parameter affects VRAM usage and training time, if you wish to create a smaller model.
 
 ## Future Work
 Training the model on the WET files from Common Crawl would be a very interesting expansion of this project, as the informal language used on sites other than Wikipedia may help the generated responses to be more conversational.
