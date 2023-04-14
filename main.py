@@ -18,7 +18,6 @@ m.eval()
 # print the number of parameters in the model
 print(sum(p.numel() for p in m.parameters())/1e6, 'M parameters')
 
-
 # Test model generation
 context = torch.zeros((1, 1), dtype=torch.long, device=h.device)
 print(enc.decode(m.generate(context, max_new_tokens=50)[0].tolist()))
@@ -29,10 +28,9 @@ user_input = input("Input: ")
 # Main loop
 while(user_input != "exit"):
     # Encode the input into tokens
-    #encoded_input = enc.encode(user_input)
-    #print(encoded_input)
-
-    encoded_input = enc.encode("Activities include")
+    encoded_input = enc.encode(user_input)
+    
+    print(f"Encoded input: {encoded_input}")
 
     # Generate from the model
     #context = torch.zeros((1, 1), dtype=torch.long, device=h.device)
