@@ -17,17 +17,7 @@ directory = os.fsencode(os.path.join(ROOT_DIR, data_path))
 # Tiktoken encoding
 enc = tiktoken.get_encoding("cl100k_base")
 
-# data loading
-def get_batch(split):
-    # generate a small batch of data of inputs x and targets y
-    data = train_data if split == 'train' else test_data
-    ix = torch.randint(len(data) - h.block_size, (h.batch_size,))
-    x = torch.stack([data[i:i+h.block_size] for i in ix])
-    y = torch.stack([data[i+1:i+h.block_size+1] for i in ix])
-    x, y = x.to(h.device), y.to(h.device)
-    return x, y
-
-def my_get_batch(split):
+def my_get_batch_random(split):
     data = train_data if split == 'train' else test_data
     row = data[random.randint(0, len(data)-1)]                  # Pick random row
 
@@ -49,6 +39,44 @@ def my_get_batch(split):
             x_temp.append(row[(j + random_offset)])
             y_temp.append(row[(j + random_offset + 1)])
 
+        # Pad the end of the block if we happen to get a row that is too short to grab block_size
+        while(len(x_temp) < h.block_size):
+            x_temp.append(0)
+        while(len(y_temp) < h.block_size):
+            y_temp.append(0)
+
+        # Add the array of inputs and targets to the matrix
+        x_ary.append(torch.tensor(x_temp))
+        y_ary.append(torch.tensor(y_temp))
+    
+    # Convert matrix into a tensor, send to GPU and return
+    x = torch.stack(x_ary)
+    y = torch.stack(y_ary)
+    x, y = x.to(h.device), y.to(h.device)
+    return x, y
+
+def my_get_batch_row(split, i):
+    data = train_data if split == 'train' else test_data
+    #row = data[random.randint(0, len(data)-1)]                  # Pick random row
+    row = data[i]
+
+    x_ary = []
+    y_ary = []
+
+    # Grab batch_size number of blocks of inputs and targets
+    for i in range(h.batch_size):
+        x_temp = []
+        y_temp = []
+
+        random_offset = random.randint(0, max(len(row) - h.block_size, 0))
+        #random_offset = 0
+
+        # Grab a block_size block of inputs and targets
+        for j in range(h.block_size):
+            if((j + random_offset) > len(row) - 2):
+                break
+            x_temp.append(row[(j + random_offset)])
+            y_temp.append(row[(j + random_offset + 1)])
 
         # Pad the end of the block if we happen to get a row that is too short to grab block_size
         while(len(x_temp) < h.block_size):
@@ -60,13 +88,6 @@ def my_get_batch(split):
         x_ary.append(torch.tensor(x_temp))
         y_ary.append(torch.tensor(y_temp))
     
-    '''
-    # Pad the end of the input if we happen to get a row that is too short to grab batch_size number of chunks from it
-    while(len(x_ary) < h.batch_size):
-        x_ary.append(torch.zeros(len(x_ary[0])))
-    while(len(y_ary) < h.batch_size):
-        y_ary.append(torch.zeros(len(y_ary[0])))
-    '''
     # Convert matrix into a tensor, send to GPU and return
     x = torch.stack(x_ary)
     y = torch.stack(y_ary)
@@ -80,7 +101,7 @@ def estimate_loss():
     for split in ['train', 'val']:
         losses = torch.zeros(h.est_iters)
         for k in range(h.est_iters):
-            X, Y = my_get_batch(split)
+            X, Y = my_get_batch_random(split)
             logits, loss = model(X, Y)
             losses[k] = loss.item()
         out[split] = losses.mean()
@@ -120,10 +141,24 @@ for file in tqdm(os.listdir(directory)):
     train_data = data_array[:n]
     test_data = data_array[n:]
     
+    # This takes num_batches from each file, useful for nomalizing training time on each file
+    '''
     for iter in tqdm(range(h.num_batches)):
         # Sample a batch of data
         # xb, yb = get_batch('train')
-        xb, yb = my_get_batch('train')
+        xb, yb = my_get_batch_random('train')
+
+        # Evaluate the loss
+        logits, loss = model(xb, yb)
+        optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        optimizer.step()
+    '''
+    
+    for i in tqdm(range(len(train_data))):
+        # Sample a batch of data
+        # xb, yb = get_batch('train')
+        xb, yb = my_get_batch_row('train', i)
 
         # Evaluate the loss
         logits, loss = model(xb, yb)
@@ -131,21 +166,14 @@ for file in tqdm(os.listdir(directory)):
         loss.backward()
         optimizer.step()
 
+
     # Estimate loss after training on a given file has finished
     losses = estimate_loss()
     model_debug.write(f"{count},{losses['train']:.4f},{losses['val']:.4f}\n")
 
-    # Manual limit on number of files trained on
-    if count > 10:
-        break
+    # Save the weights and losses
+    torch.save(model.state_dict(), os.path.join(ROOT_DIR, 'trained models', 'weights-{}.pt'.format(count)))
+    model_debug.close()
+    model_debug = open(os.path.join(ROOT_DIR, 'trained models', 'model_loss.txt'), 'a', encoding='utf-8')
 
     count += 1
-
-model_debug.close()
-
-# Save the weights
-torch.save(model.state_dict(), os.path.join(ROOT_DIR, 'trained models', 'weights.pt'))
-
-# Generate from the model
-context = torch.zeros((1, 1), dtype=torch.long, device=h.device)
-print(enc.decode(model.generate(context, max_new_tokens=50)[0].tolist()))

@@ -13,11 +13,11 @@ The Wikipedia data is tokenized using [OpenAI's Tiktoken library](https://github
 ## Project Limitations
 Here is a list of limitations of this model in order of easiest-to-address to hardest-to-address
 
-- Context Size: This language model by default uses a context size of 16, as set in `hyperparameters.py`, meaning that only the past 16 tokens are considered when the model is generating text. For context, the last-generation GPT-3 model uses 2048 tokens for context, meaning my model uses 0.8% the maximum context of GPT-3. While this is not important for shorter queries and responses, it is integral to have a large context size for longer, more coherent responses.
+- Context Size: This language model by default uses a context size of 128 tokens, as set in `hyperparameters.py`, meaning that only the past 128 tokens are considered when the model is generating text. For context, the last-generation GPT-3 model uses 2048 tokens for context, meaning my model uses 6.25% the maximum context of GPT-3. While this is not important for shorter queries and responses, it is integral to have a large context size for longer, more coherent responses.
 
 - Dataset: This language model is trained on a ~26GB dump from Wikipedia. While this is a lot of text, it is very small compared to the amount of text that the last-generation GPT-3 model was trained on. GPT-3 was also trained on a dataset from Wikipedia, but this dataset makes up only 0.6% of the tokens that GPT-3 was trained on. To even come close to the amount of data GPT-3 was trained on, much more storage space would be required.
 
-- Parameters: This language model uses 87.76 million parameters, which might seem like a lot, but for reference the last-generation GPT-3 model uses 175 billion parameters, meaning my model uses 0.05% (about one half of one half of one half of one half of one percent!) the parameters of GPT-3. As such, its output can not be expected to be on par with GPT-3.
+- Parameters: This language model uses 140.66 million parameters, which might seem like a lot, but for reference the last-generation GPT-3 model uses 175 billion parameters, meaning my model uses 0.08% (about one half of one half of one half of one half of one percent!) the parameters of GPT-3. As such, its output can not be expected to be on par with GPT-3.
 
 - Training Hardware: This language model was trained on high-end consumer hardware, which presents limitations in the amount of RAM, VRAM, and overall compute power available for the model. Additionally, this limits the size of the model through limitations on available storage for training data and exported model weights.
 

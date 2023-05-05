@@ -121,7 +121,8 @@ class GPTLanguageModel(torch.nn.Module):
 
     def generate(self, idx, max_new_tokens):
         # idx is (B, T) array of indices in the current context
-        output = torch.zeros((1, 1), dtype=torch.long, device=h.device)
+        #output = torch.zeros((1, 1), dtype=torch.long, device=h.device)
+        output = idx
 
         for _ in range(max_new_tokens):
             # crop idx to the last block_size tokens
